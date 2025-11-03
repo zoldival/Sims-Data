@@ -162,6 +162,8 @@ def mcErrorView (df, title="", tFun=timeCol, verbose=False):
     ax3.legend()
     ax4.legend()
 
+    fig.suptitle(title)
+
     fig.show()
 
 
