@@ -13,7 +13,7 @@ k = R/(m * c)     #let k = R/(m*c)
 
 df = pl.read_parquet("Docs/Columns.csv")
 
-df.select([a for a in df.columns if a.startswith("SME") and a[9] == "T"]).mean_horizontal()
+df.select([a for a in df.columns if a.startswith("SME") and a[9] == "T"])
 
 #Initital conditions
 T0 = 22 # Tnitial temperature of the cell in °C
