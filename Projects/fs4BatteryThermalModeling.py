@@ -30,7 +30,9 @@ def thermal_ode(t_eval,I, k):
     I = df.select([a for a in df.columns if a.startswith("ACC") and a[9] == "T"]).mean_horizontal()  #takes average of all variables starting with ACC and the 10th index equaling T
     dT_dt = k * (I ** 2)
     # Numerical Integration using Runge Kutta method (RK45)
-    return solve_ivp(dT_dt, T0, method = 'RK45', t_eval = t_eval, args = (k,), rtol = 1e-6, atol= 1e-9)
+    return dT_dt
+    
+solution = solve_ivp(thermal_ode, T0, method = 'RK45', t_eval = t_eval, args = (k,), rtol = 1e-6, atol= 1e-9)
 
 #plotting the results
 plt.scatter(t_eval, thermal_ode(t_eval, df, k).y[0], s=1)
