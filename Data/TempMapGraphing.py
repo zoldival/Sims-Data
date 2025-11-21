@@ -13,7 +13,7 @@ s0c0 = "ACC_SEG0_TEMPS_CELL0"
 s0t0 = "ACC_SEG0_VOLTS_CELL0"
 
 seg0 = [i for i in df.columns if i.startswith("ACC_SEG0_TEMPS")]
-segs = [[i for i in df.columns if i.startswith(f"ACC_SEG{j}_VOLTS")] for j in range(5)]
+segs = [[i for i in df.columns if i.startswith(f"ACC_SEG{j}_TEMPS")] for j in range(5)]
 segs
 
 dftt = df.filter(pl.col(s0c0) != 0)[seg0]
