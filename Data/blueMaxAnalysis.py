@@ -67,6 +67,9 @@ heBR = "TPERIPH_BR_DATA_WHEELSPEED"
 
 blueMaxGPS_Square = ((-121.7330999, 38.5759097),(-121.7328352, 38.5757670)) ## Tuned! Generally make it bigger than you need probably beacuse GPS is infrequent.
 
+dfRegenTest = read("C:/Projects/FormulaSlug/fs-data/FS-3/11222025/11222025_6_RegenTest1.parquet")
+dfRegenTest.insert_column(0, simpleTimeCol(dfRegenTest))
+
 dfautox = readValid("FS-3/08172025/08172025_28autox3&4_45C_40C_~29Cambient_0fans.parquet")
 dfautox.insert_column(0, simpleTimeCol(dfautox))
 
@@ -236,6 +239,23 @@ def voltagePredictionFunction(x, a1, a2, a3, b1, b2, b3, c1, c2, c3):
 
 # df = readCorrectedFSDAQ("FS-3/08172025raw/08172025fsdaq/08172025_20.fsdaq", dbcPath)
 # basicView(df.filter(pl.col("VDM_GPS_VALID1") == 1))
+
+basicView(dfRegenTest)
+plt.plot(dfRegenTest["SME_CURRLIM_ChargeCurrentLim"])
+plt.show()
+
+dfRegenTest2 = read("C:/Projects/FormulaSlug/fs-data/FS-3/11222025/11222025_12.parquet")
+dfRegenTest2.insert_column(0, simpleTimeCol(dfRegenTest2))
+basicView(dfRegenTest2)
+
+plt.plot(dfRegenTest2[heBL], label=heBL)
+plt.plot(dfRegenTest2[heFL], label=heFL)
+plt.plot(dfRegenTest2[heBR], label=heBR)
+plt.plot(dfRegenTest2[heFR], label=heFR)
+plt.show()
+
+plt.plot(dfRegenTest2["SME_CURRLIM_ChargeCurrentLim"])
+plt.show()
 
 fig1 = plt.figure(layout="constrained")
 ax1 = fig1.add_subplot(221)
