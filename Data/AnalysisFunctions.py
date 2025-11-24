@@ -167,7 +167,7 @@ def mcErrorView (df, title="", tFun=timeCol, verbose=False):
     fig.show()
 
 
-def basicView (df, title="", tFun=timeCol, scatterGPS=False, scaled=False, cellVoltages=False, verbose=False, faults=False):
+def basicView (df, title="", tFun=timeCol, scatterGPS=False, scaled=False, cellVoltages=False, verbose=False, faults=False, tempsInsteadOfVoltages=False):
     '''
     Loads a basic view of a given run. Built for FS-3 Data generated and collected by the team.
 
@@ -188,6 +188,9 @@ def basicView (df, title="", tFun=timeCol, scatterGPS=False, scaled=False, cellV
     verbose
         Whether to print debug messages while generating the graph
     '''
+
+    tempVoltStr = "TEMPS" if tempsInsteadOfVoltages else "VOLTS"
+
     if not ("Time" in df.columns):
         df.insert_column(0, tFun(df, verbose))
 
@@ -200,8 +203,8 @@ def basicView (df, title="", tFun=timeCol, scatterGPS=False, scaled=False, cellV
     ax6 = fig.add_subplot(326)
     for i in range(5):
         for j in range(6):
-            ax1.plot(df[t],df[f"ACC_SEG{i}_VOLTS_CELL{j}"])
-    ax1.set_title("Acc Seg Voltages")
+            ax1.plot(df[t],df[f"ACC_SEG{i}_" + tempVoltStr + f"_CELL{j}"])
+    ax1.set_title(f"Acc Seg {tempVoltStr}")
     ax2.plot(df[t],df[V], color="cyan", label="Total As Reported by Acc")
     b = sum([sum([df[f"ACC_SEG{i}_VOLTS_CELL{j}"] for j in range(6)]) for i in range (5)])
     ax2.plot(df[t],b, color="pink", label="Sum of Cells")
@@ -237,7 +240,7 @@ def basicView (df, title="", tFun=timeCol, scatterGPS=False, scaled=False, cellV
     ax6.set_title("Acceleration (X)")
 
     ax1.set_xlabel("Time (s)")
-    ax1.set_ylabel("Voltage (V)")
+    ax1.set_ylabel("Voltage (V)" if not tempsInsteadOfVoltages else "Temperature (C)")
     ax2.set_xlabel("Time (s)")
     ax2.set_ylabel("Voltage (V)")
     ax3.set_xlabel("Time (s)")
