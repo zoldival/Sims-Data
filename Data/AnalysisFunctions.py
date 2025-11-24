@@ -187,9 +187,18 @@ def basicView (df, title="", tFun=timeCol, scatterGPS=False, scaled=False, cellV
         Whether to plot the cell voltages on the plot with ACC and MC voltages
     verbose
         Whether to print debug messages while generating the graph
+    faults
+        Whether to plot fault codes on the graph
+    tempsInsteadOfVoltages
+        Whether to plot temperatures instead of voltages for the ACC segments
     '''
 
     tempVoltStr = "TEMPS" if tempsInsteadOfVoltages else "VOLTS"
+
+    df = df.with_columns(
+        pl.Series(np.convolve(df["ACC_STATUS_BMS_FAULT"].to_numpy(), [1, -1], 'same')).alias("BMS_FaultStart"),
+        pl.Series(np.convolve(df["ACC_STATUS_IMD_FAULT"].to_numpy(), [1, -1], 'same')).alias("IMD_FaultStart")
+        )
 
     if not ("Time" in df.columns):
         df.insert_column(0, tFun(df, verbose))
@@ -205,6 +214,9 @@ def basicView (df, title="", tFun=timeCol, scatterGPS=False, scaled=False, cellV
         for j in range(6):
             ax1.plot(df[t],df[f"ACC_SEG{i}_" + tempVoltStr + f"_CELL{j}"])
     ax1.set_title(f"Acc Seg {tempVoltStr}")
+    ax1.vlines(df.filter(pl.col("BMS_FaultStart") == 1)[t].to_numpy(), ymin=ax1.get_ylim()[0], ymax=ax1.get_ylim()[1], colors="red", label="BMS Fault")
+    ax1.vlines(df.filter(pl.col("IMD_FaultStart") == 1)[t].to_numpy(), ymin=ax1.get_ylim()[0], ymax=ax1.get_ylim()[1], colors="orange", label="IMD Fault")
+
     ax2.plot(df[t],df[V], color="cyan", label="Total As Reported by Acc")
     b = sum([sum([df[f"ACC_SEG{i}_VOLTS_CELL{j}"] for j in range(6)]) for i in range (5)])
     ax2.plot(df[t],b, color="pink", label="Sum of Cells")
@@ -218,6 +230,8 @@ def basicView (df, title="", tFun=timeCol, scatterGPS=False, scaled=False, cellV
         ax22.legend()
         ax22.set_ylabel("Voltage (V)")
     ax2.set_title("Voltages")
+    if faults:
+        ax2.plot(df[t],df[smeFaultCode], label="MC Fault Code", color="red")
     ax2.legend()
     # ax3.plot(df[t],df[tsC], label="Accumulator Current")
     ax3.plot(df[t],df[busC], label = "Motor Controller Current")
@@ -248,7 +262,7 @@ def basicView (df, title="", tFun=timeCol, scatterGPS=False, scaled=False, cellV
     ax4.set_xlabel("Longitude (deg)")
     ax4.set_ylabel("Latitude (deg)")
     ax5.set_xlabel("Time (s)")
-    ax5.set_ylabel("Voltage (V)")
+    # ax5.set_ylabel("Voltage (V)")
     ax6.set_xlabel("Time (s)")
     ax6.set_ylabel("Acceleration (Gs)")
 
