@@ -1,2 +1,2 @@
-# Simulations
-Vehicle Dynamics Simulations for Formula Slug written from the ground up in python
+# Sims-Data
+Vehicle Dynamics Simulations and Data Analysis for Formula Slug written from the ground up in python.
