@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from slice_viewer import SliceViewer
 
-from Data.AnalysisFunctions import *
+from Data.FSLib.AnalysisFunctions import *
 
 df = read("C:/Projects/FormulaSlug/fs-data/FS-3/08102025/08102025Endurance1_SecondHalf.parquet")
 df = df.insert_column(0, simpleTimeCol(df))

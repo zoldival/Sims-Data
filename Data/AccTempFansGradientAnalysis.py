@@ -3,9 +3,9 @@ import matplotlib.pyplot as plt
 import cantools.database as db
 
 # from DataDecoding_N_CorrectionScripts.dataDecodingFunctions import *
-from Data.AnalysisFunctions import *
-from Data.integralsAndDerivatives import *
-from Data.fftTools import *
+from Data.FSLib.AnalysisFunctions import *
+from Data.FSLib.IntegralsAndDerivatives import *
+from Data.FSLib.fftTools import *
 
 # lv = "GLV"
 # v = "Violation"

@@ -1,8 +1,8 @@
 import polars as pl
 import matplotlib.pyplot as plt
-from Data.integralsAndDerivatives import *
-from Data.fftTools import *
-from Data.AnalysisFunctions import *
+from Data.FSLib.IntegralsAndDerivatives import *
+from Data.FSLib.fftTools import *
+from Data.FSLib.AnalysisFunctions import *
 
 dbcPath = "../fs-3/CANbus.dbc"
 
