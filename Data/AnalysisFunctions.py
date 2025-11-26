@@ -104,7 +104,8 @@ def timeCol(df, verbose = False):
 
 def simpleTimeCol (df, verbose=False):
     stepSize = 60/5035
-    return pl.Series(np.arange(0,df.height*stepSize, stepSize)).alias("Time")
+    ser = pl.Series(np.arange(0,df.height*stepSize, stepSize)).alias("Time")
+    return ser.slice(0, df.height)
 
 def mcErrorView (df, title="", tFun=timeCol, verbose=False):
     '''
@@ -136,13 +137,13 @@ def mcErrorView (df, title="", tFun=timeCol, verbose=False):
     ax2.plot(df[t], df[smeFaultCode], label = "Fault Code")
     ax2.plot(df[t], df[smeFaultLevel], label = "Fault Level")
 
-    ax3.plot(df[t], df[rpm]/100, label="RPM/100")
-    ax3.plot(df[t], df[torqueDemand]/32767*180, label = "Torque Demand (Nm)")
+    ax3.plot(df[t], df[rpm]/100, label="RPM/100", alpha=0.7)
+    ax3.plot(df[t], df[torqueDemand]/32767*180, label = "Torque Demand (Nm)", alpha=0.7)
 
-    ax4.plot(df[t], df[pedalTravel], label = "Pedal Travel")
+    ax4.plot(df[t], df[pedalTravel]*3, label = "Pedal Travel (%*3)")
     ax4.plot(df[t], df[etcBrakeVoltage], label = "Brake Voltage")
-    ax4.plot(df[t], df[etcImplausibility]*500, label = "ETC Implausibility")
-    ax4.plot(df[t], df[etcRTDButton], label = "RTD Button")
+    ax4.plot(df[t], df[etcImplausibility].cast(pl.Int16)*300, label = "ETC Implausibility")
+    ax4.plot(df[t], df[etcRTDButton].cast(pl.Int16)*250, label = "RTD Button")
 
     ax1.set_title("Voltages")
     ax2.set_title("MC Error and code")
@@ -197,7 +198,8 @@ def basicView (df, title="", tFun=timeCol, scatterGPS=False, scaled=False, cellV
 
     df = df.with_columns(
         pl.Series(np.convolve(df["ACC_STATUS_BMS_FAULT"].to_numpy(), [1, -1], 'same')).alias("BMS_FaultStart"),
-        pl.Series(np.convolve(df["ACC_STATUS_IMD_FAULT"].to_numpy(), [1, -1], 'same')).alias("IMD_FaultStart")
+        pl.Series(np.convolve(df["ACC_STATUS_IMD_FAULT"].to_numpy(), [1, -1], 'same')).alias("IMD_FaultStart"),
+        pl.Series(np.convolve(df["ETC_STATUS_IMPLAUSIBILITY"].to_numpy(), [1, -1], 'same')).alias("APPS_ImplausibilityStart")
         )
 
     if not ("Time" in df.columns):
@@ -216,6 +218,8 @@ def basicView (df, title="", tFun=timeCol, scatterGPS=False, scaled=False, cellV
     ax1.set_title(f"Acc Seg {tempVoltStr}")
     ax1.vlines(df.filter(pl.col("BMS_FaultStart") == 1)[t].to_numpy(), ymin=ax1.get_ylim()[0], ymax=ax1.get_ylim()[1], colors="red", label="BMS Fault")
     ax1.vlines(df.filter(pl.col("IMD_FaultStart") == 1)[t].to_numpy(), ymin=ax1.get_ylim()[0], ymax=ax1.get_ylim()[1], colors="orange", label="IMD Fault")
+    ax1.vlines(df.filter(pl.col("APPS_ImplausibilityStart") == 1)[t].to_numpy(), ymin=ax1.get_ylim()[0], ymax=ax1.get_ylim()[1], colors="blue", label="APPS Implausibility")
+    ax1.legend()
 
     ax2.plot(df[t],df[V], color="cyan", label="Total As Reported by Acc")
     b = sum([sum([df[f"ACC_SEG{i}_VOLTS_CELL{j}"] for j in range(6)]) for i in range (5)])
